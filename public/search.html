@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search | The Hiking & Outdoors Programmatic | jujoja.com</title>
+    <meta name="description" content="Advanced search for hiking trails, camping tips, and outdoor adventures">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- MiniSearch for Client-Side Search -->
+    <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js"></script>
+    
+    <!-- Marquee Library -->
+    <link rel="stylesheet" href="/css/marquee.css">
+    
+    <style>
+        :root {
+            --primary: #1a5f7a;
+            --secondary: #2d8b6e;
+            --accent: #4a9c6d;
+            --dark: #0d1b2a;
+            --light: #f8f9fa;
+            --text: #334155;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: var(--dark);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: white;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: var(--gradient);
+            color: white;
+            padding: 120px 2rem 80px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+        
+        /* Search Results Hero */
+        .search-hero {
+            background: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .search-hero h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .back-home {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .back-home:hover {
+            color: var(--primary);
+        }
+        
+        /* Search Filters */
+        .search-filters {
+            background: white;
+            padding: 2rem;
+            margin: -2rem auto 2rem;
+            max-width: 1000px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        
+        .filter-select, .filter-checkbox {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-select:focus, .filter-checkbox:focus {
+            border-color: var(--accent);
+        }
+        
+        /* Search Results Section */
+        .search-results-section {
+            background: white;
+            padding: 2rem;
+            min-height: calc(100vh - 300px);
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .results-count {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .search-query-display {
+            background: #f1f5f9;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            color: var(--text);
+            font-style: italic;
+        }
+        
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        
+        .result-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+        
+        .result-excerpt {
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        
+        .highlight {
+            background: #fef3c7;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        
+        .result-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .result-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .badge {
+            background: #e0f2fe;
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge-hard { background: #fee2e2; color: #dc2626; }
+        .badge-medium { background: #fef3c7; color: #d97706; }
+        .badge-easy { background: #d1fae5; color: #059669; }
+        
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+        
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+        }
+        
+        .page-btn {
+            padding: 0.75rem 1.25rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .page-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">🏔️ jujoja.com</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/search.html">Search</a></li>
+                <li><a href="/privacy-policy">Privacy</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Search Results Hero -->
+    <section class="search-hero">
+        <h2>🔍 Search Results</h2>
+        <p id="searchQueryDisplay" style="color: #64748b; margin-bottom: 1rem;"></p>
+        <a href="/" class="back-home">← Back to Home</a>
+    </section>
+
+    <!-- Search Filters -->
+    <div class="search-filters">
+        <div class="filter-group">
+            <span class="filter-label">Difficulty:</span>
+            <select id="difficultyFilter" class="filter-select">
+                <option value="">All Difficulties</option>
+                <option value="Easy">Easy 🟢</option>
+                <option value="Medium">Medium 🟡</option>
+                <option value="Hard">Hard 🔴</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <span class="filter-label">Location:</span>
+            <input type="text" id="locationFilter" class="filter-select" placeholder="e.g., Yosemite, Appalachian...">
+        </div>
+        
+        <div class="filter-group">
+            <button onclick="applyFilters()" style="background: var(--gradient); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Apply Filters</button>
+            <button onclick="clearFilters()" style="background: #e2e8f0; color: var(--text); border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Clear Filters</button>
+        </div>
+    </div>
+
+    <!-- Search Results Section -->
+    <section class="search-results-section">
+        <div class="results-header">
+            <h3 style="font-family: 'Montserrat', sans-serif; color: var(--primary);">Results</h3>
+            <span class="results-count" id="resultsCount">0 results found</span>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <p>Searching through AI-generated content...</p>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <div class="no-results-icon">🔍</div>
+            <h3>No results found</h3>
+            <p>Try adjusting your search terms or filters.</p>
+            <a href="/" class="search-btn" style="margin-top: 1rem; display: inline-block;">Browse All Pages</a>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="results-grid" id="resultsGrid"></div>
+
+        <!-- Pagination (Future Enhancement) -->
+        <div class="pagination" id="pagination" style="display: none;"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/">Home</a>
+            <a href="/search.html">Search</a>
+            <a href="/privacy-policy">Privacy Policy</a>
+            <a href="/terms-of-service">Terms of Service</a>
+            <a href="/contact">Contact</a>
+        </div>
+        <p style="opacity: 0.7;">© 2026 jujoja.com - The Hiking & Outdoors Programmatic | Powered by Local LLMs & n8n AI Workflows</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/search.js"></script>
+    <script src="/js/marquee.js"></script>
+    <script>
+        // Search-specific initialization
+        let currentPage = 1;
+        let resultsPerPage = 12;
+        let filteredResults = [];
+
+        window.addEventListener('DOMContentLoaded', function() {
+            initSearch();
+            
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            
+            if (query) {
+                document.getElementById('searchQueryDisplay').textContent = `Searching for: "${query}"`;
+                performSearch(query);
+            }
+        });
+
+        // Perform search with URL parameters
+        function performSearch(query, page = 1) {
+            currentPage = page;
+            
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('resultsGrid').innerHTML = '';
+            document.getElementById('noResults').style.display = 'none';
+            document.getElementById('pagination').style.display = 'none';
+            document.getElementById('searchQueryDisplay').textContent = query ? `Searching for: "${query}"` : 'All hiking content';
+            
+            // Store search term in localStorage for persistence
+            if (query) {
+                localStorage.setItem('jujoja_lastSearch', query);
+            }
+
+            setTimeout(() => {
+                document.getElementById('loadingState').style.display = 'none';
+                
+                if (!query) {
+                    showAllResults();
+                    return;
+                }
+                
+                searchAndFilter(query);
+            }, 300);
+        }
+
+        // Search and filter results
+        function searchAndFilter(query) {
+            const results = miniSearch.search(query, {
+                fuzzy: 0.2,
+                prefix: true,
+                boost: { title: 2 }
+            });
+            
+            filteredResults = results.map(id => articles[id]);
+            
+            // Apply filters
+            applyFiltersToResults();
+            
+            displayResults(filteredResults.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage));
+        }
+
+        // Show all results (no search query)
+        function showAllResults() {
+            filteredResults = articles;
+            applyFiltersToResults();
+            displayResults(filteredResults.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage));
+        }
+
+        // Apply filters to results
+        function applyFiltersToResults() {
+            const difficultyFilter = document.getElementById('difficultyFilter').value;
+            const locationFilter = document.getElementById('locationFilter').value.toLowerCase();
+            
+            filteredResults = filteredResults.filter(page => {
+                // Filter by difficulty
+                if (difficultyFilter && page.difficulty !== difficultyFilter) {
+                    return false;
+                }
+                
+                // Filter by location
+                if (locationFilter && !page.location?.toLowerCase().includes(locationFilter)) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            updateResultsCount();
+        }
+
+        // Apply filters button
+        function applyFilters() {
+            currentPage = 1;
+            performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
+                document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '');
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('difficultyFilter').value = '';
+            document.getElementById('locationFilter').value = '';
+            currentPage = 1;
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.delete('q');
+            urlParams.delete('page');
+            urlParams.delete('difficulty');
+            urlParams.delete('location');
+            
+            window.history.replaceState({}, '', `/search.html?${urlParams.toString()}`);
+            
+            performSearch();
+        }
+
+        // Update results count
+        function updateResultsCount() {
+            const displayQuery = document.getElementById('searchQueryDisplay').textContent;
+            const hasQuery = displayQuery.includes('"');
+            
+            document.getElementById('resultsCount').textContent = 
+                hasQuery ? `${filteredResults.length} results found` : `${filteredResults.length} pages available`;
+        }
+
+        // Display results
+        function displayResults(results) {
+            const grid = document.getElementById('resultsGrid');
+            grid.innerHTML = '';
+            
+            if (results.length === 0) {
+                document.getElementById('noResults').style.display = 'block';
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+            
+            results.forEach((result, index) => {
+                const card = document.createElement('div');
+                card.className = 'result-card fade-in';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                // Get difficulty badge class
+                let badgeClass = 'badge';
+                if (result.difficulty === 'Easy') badgeClass = 'badge-easy';
+                else if (result.difficulty === 'Medium') badgeClass = 'badge-medium';
+                else if (result.difficulty === 'Hard') badgeClass = 'badge-hard';
+                
+                card.innerHTML = `
+                    <h3 class="result-title">${escapeHtml(result.title)}</h3>
+                    <p class="result-excerpt">${highlightSearchTerms(result.content, document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, ''))}</p>
+                    <div class="result-meta">
+                        <span>📍 ${escapeHtml(result.location || 'Unknown')}</span>
+                        <span>🥾 <span class="${badgeClass} badge">${escapeHtml(result.difficulty || 'N/A')}</span></span>
+                        <span>📏 ${escapeHtml(result.length || 'Unknown')} miles</span>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    viewFullPage(result);
+                });
+                
+                grid.appendChild(card);
+            });
+            
+            // Show pagination if needed
+            displayPagination();
+        }
+
+        // Display pagination controls
+        function displayPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredResults.length / resultsPerPage) || 1;
+            
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            pagination.innerHTML = '';
+            
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.textContent = 'Previous';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
+                document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', currentPage - 1);
+            pagination.appendChild(prevBtn);
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
+                    document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', i);
+                pagination.appendChild(pageBtn);
+            }
+            
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.textContent = 'Next';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
+                document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', currentPage + 1);
+            pagination.appendChild(nextBtn);
+        }
+
+        // View full page
+        function viewFullPage(page) {
+            const url = `/page/${encodeURIComponent(page.id)}.html`;
+            
+            fetch(url).then(response => {
+                if (response.ok) {
+                    window.open(url, '_blank');
+                } else {
+                    alert(`Page not found: ${page.title}. Our AI is still generating content!`);
+                }
+            }).catch(() => {
+                alert('Page loading in progress. Check back later!');
+            });
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            initSearch();
+            
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            
+            if (query) {
+                document.getElementById('searchQueryDisplay').textContent = `Searching for: "${query}"`;
+                performSearch(query);
+            } else {
+                showAllResults();
+            }
+        });
+    </script>
+</body>
+</html>

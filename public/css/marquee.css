@@ -1,0 +1,63 @@
+/* public/css/marquee.css */
+
+.marquee-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.marquee-container {
+    display: flex;
+    width: fit-content;
+    will-change: transform;
+}
+
+.marquee-item {
+    padding: 1rem 2rem;
+    font-weight: 600;
+    color: var(--primary);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Smooth transitions for pausing */
+.marquee-container.paused {
+    animation-play-state: paused;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .marquee-item {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .marquee-container {
+        animation-duration: 20s;
+    }
+}
+
+/* Web Animations API fallback */
+@supports (animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1)) {
+    .marquee-container {
+        will-change: transform;
+    }
+}
+
+/* Accessibility - reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .marquee-container {
+        animation: none;
+    }
+    
+    .marquee-item {
+        opacity: 1;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .marquee-item {
+        border-bottom: 2px solid currentColor;
+    }
+}

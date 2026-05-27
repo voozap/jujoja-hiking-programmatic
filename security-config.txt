@@ -1,0 +1,53 @@
+=================================================================
+SECURITY CONFIGURATION FOR JUJOJA.COM
+The Hiking & Outdoors Programmatic Website
+=================================================================
+
+1. VERCEL DEPLOYMENT SECURITY
+-----------------------------------------------------------------
+✅ HTTPS is automatic and enforced
+✅ Custom domain verification via DNS records
+✅ Automatic SSL certificate provisioning
+✅ CDN-level DDoS protection included
+✅ Firewall protection at no cost
+
+2. HTTP SECURITY HEADERS (Applied via vercel.json)
+-----------------------------------------------------------------
+• Strict-Transport-Security: HSTS with preload
+• X-Content-Type-Options: nosniff (prevents MIME sniffing)
+• X-Frame-Options: DENY (prevents clickjacking)
+• X-XSS-Protection: 1; mode=block (XSS filter)
+• Referrer-Policy: strict-origin-when-cross-origin
+• Permissions-Policy: Blocks sensitive browser features
+• Content-Security-Policy: Restricts resource loading
+
+3. CUSTOM SECURITY MEASURES YOU CAN ADD
+-----------------------------------------------------------------
+A. Rate Limiting (via Cloudflare or Vercel Edge Functions)
+   - Limit search requests to 100 per minute per IP
+   - Prevent brute force attacks on search functionality
+   
+B. Content Security Policy Enhancement
+   - Remove 'unsafe-inline' when using nonces
+   - Add explicit font-src restrictions
+   - Block inline scripts with nonce-based CSP
+
+C. CORS Configuration (if serving API)
+   - Restrict origins to your domain only
+   - Use credentials: true for authenticated requests
+   
+D. Subresource Integrity (SRI)
+   - Add integrity hashes to all CDN resources
+   - Prevent tampering with external scripts
+
+E. Input Sanitization
+   - All user inputs sanitized before processing
+   - Escape HTML in search results
+   - Validate trail name and location data
+
+4. LOCAL LLM INTEGRATION SECURITY (Ollama)
+-----------------------------------------------------------------
+A. NEVER expose Ollama API to the internet without authentication
+B. Use reverse proxy with authentication:
+   
+   nginx.conf example:
