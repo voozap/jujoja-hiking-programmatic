@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-05-27T00:00:00Z",
+  "metadata": {
+    "totalPages": 4,
+    "generatedBy": "Official Data Aggregation System",
+    "dataSource": "NPS API + USGS Trail Data + Recreation.gov RIDB"
+  },
+  "pages": [
+    {
+      "id": "trail-001",
+      "title": "Yosemite Valley Hiking Trails Guide",
+      "content": "Comprehensive guide to hiking trails in Yosemite National Park including Half Dome, Mist Trail, and Lower Yosemite Fall. Features detailed information on trail difficulty, elevation gain, estimated completion times, and seasonal considerations.",
+      "trailName": "Half Dome Trail",
+      "location": "Yosemite National Park, California",
+      "difficulty": "Hard",
+      "length": "14.2 miles"
+    },
+    {
+      "id": "trail-002",
+      "title": "Appalachian Trail Camping Essentials",
+      "content": "Essential camping tips for Appalachian Trail hikers including gear recommendations, shelter selection, fire regulations, and Leave No Trace principles. Covers both established campgrounds and dispersed camping options.",
+      "trailName": "Appalachian Trail",
+      "location": "Appalachian Mountain Range, USA",
+      "difficulty": "Medium",
+      "length": "2,190 miles"
+    },
+    {
+      "id": "trail-003",
+      "title": "Great Smoky Mountains Beginner Hikes",
+      "content": "Perfect beginner hiking trails in the Great Smoky Mountains National Park. Easy to moderate trails with stunning scenery and wildlife viewing opportunities.",
+      "trailName": "Clingmans Dome Trail",
+      "location": "Great Smoky Mountains National Park, Tennessee/North Carolina",
+      "difficulty": "Easy",
+      "length": "3 miles"
+    },
+    {
+      "id": "trail-004",
+      "title": "Zion National Park Angels Landing",
+      "content": "One of the most iconic and challenging hikes in Zion National Park. This strenuous trail offers thrilling cliff-hugging experiences with breathtaking panoramic views.",
+      "trailName": "Angels Landing",
+      "location": "Zion National Park, Utah",
+      "difficulty": "Hard",
+      "length": "5.4 miles"
+    }
+  ]
+}
