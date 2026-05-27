@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "The Hiking & Outdoors Programmatic - AI-generated hiking trails powered by local LLMs",
   "type": "module",
+  "main": "index.html",
   "scripts": {
     "start": "npx serve public -l 3000",
     "build": "echo 'Static site - no build needed'",
