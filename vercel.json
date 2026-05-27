@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "framework": "none",
+  "framework": "node",
   "outputDirectory": "dist",
   
   "rewrites": [
