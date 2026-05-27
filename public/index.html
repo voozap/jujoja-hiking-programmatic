@@ -423,31 +423,17 @@
     </section>
 
     <!-- Search Section -->
-    <section class="search-section" id="searchSection">
-        <div class="search-container">
-            <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">Search Verified Trail Information</h2>
-            <p style="color: #64748b; margin-bottom: 2rem;">Find official trail data, camping locations, and outdoor recreation information from trusted government sources</p>
-            
-            <div class="search-input-wrapper">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="Search trails by name, location, difficulty... e.g., 'Yosemite hiking' or 'Appalachian Trail camping'"
-                    autocomplete="off"
-                >
-                <button class="search-btn" onclick="performSearch()">Search Trails</button>
-            </div>
+    <div class="search-input-wrapper">
+    <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search trails by name, location, difficulty... e.g., 'Yosemite hiking' or 'Appalachian Trail camping'"
+        autocomplete="off"
+    >
+    <!-- Changed: Now redirects to search.html instead of calling performSearch() -->
+    <button class="search-btn" onclick="window.location.href='/search.html'">Search Trails</button>
+</div>
 
-            <!-- Loading State -->
-            <div class="loading" id="loadingState">
-                <div class="spinner"></div>
-                <p>Searching through verified trail data...</p>
-            </div>
-
-            <!-- Results -->
-            <div id="searchResults"></div>
-        </div>
-    </section>
 
     <!-- Page Grid (AI Generated Pages) -->
     <section class="page-grid" id="pageGrid">
