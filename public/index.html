@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Hiking & Outdoors Programmatic | jujoja.com</title>
-    <meta name="description" content="AI-generated hiking trails, outdoor adventures, and programmatic recreation data powered by local LLMs">
+    <meta name="description" content="Official hiking trails, outdoor adventures, and recreation data from NPS, USGS, and federal sources">
     
-    <!-- Security Headers (Vercel will apply these) -->
+    <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'">
     
     <!-- Favicon -->
@@ -87,11 +87,14 @@
             color: white;
         }
         
-        /* Hero Section */
+        /* Hero Section with Image */
         .hero {
-            background: var(--gradient);
+            background: linear-gradient(rgba(13, 27, 42, 0.7), rgba(13, 27, 42, 0.5)), 
+                        url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
             color: white;
-            padding: 120px 2rem 80px;
+            padding: 140px 2rem 80px;
             text-align: center;
         }
         
@@ -100,13 +103,28 @@
             font-size: clamp(2rem, 5vw, 3.5rem);
             margin-bottom: 1rem;
             animation: fadeInUp 0.8s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         
-        .hero p {
-            font-size: 1.2rem;
-            max-width: 600px;
+        .hero-subtitle {
+            font-size: 1.1rem;
+            max-width: 700px;
             margin: 0 auto 2rem;
-            opacity: 0.9;
+            opacity: 0.95;
+            line-height: 1.8;
+        }
+        
+        .data-sources {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        
+        .data-sources strong {
+            color: #fef3c7;
         }
         
         /* Marquee Banner */
@@ -146,6 +164,18 @@
         .search-container {
             max-width: 700px;
             margin: 0 auto;
+        }
+        
+        .search-container h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .search-container p {
+            color: #64748b;
+            margin-bottom: 2rem;
         }
         
         .search-input-wrapper {
@@ -364,16 +394,24 @@
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="#searchSection">Search</a></li>
-                <li><a href="/api/generate-page.js">Generate Page</a></li>
-                <li><a href="#footer">Contact</a></li>
+                <li><a href="/privacy-policy">Privacy</a></li>
+                <li><a href="/contact">Contact</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section with Image -->
     <section class="hero">
         <h1 class="fade-in">The Hiking & Outdoors Programmatic</h1>
-        <p class="fade-in" style="animation-delay: 0.2s;">AI-powered hiking trails, outdoor adventures, and programmatic recreation data powered by local LLMs</p>
+        
+        <!-- Data Sources Badge -->
+        <div class="data-sources fade-in" style="animation-delay: 0.2s;">
+            <strong>📊 Official Data Sources:</strong> NPS API | USGS National Digital Trails | Recreation.gov RIDB
+        </div>
+        
+        <p class="hero-subtitle fade-in" style="animation-delay: 0.3s;">
+            Discover verified hiking trails, camping locations, and outdoor adventures powered by authoritative government data sources
+        </p>
     </section>
 
     <!-- Marquee Banner -->
@@ -387,23 +425,23 @@
     <!-- Search Section -->
     <section class="search-section" id="searchSection">
         <div class="search-container">
-            <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">Search Hiking Content</h2>
-            <p style="color: #64748b; margin-bottom: 2rem;">Find trails, tips, and outdoor adventures powered by AI</p>
+            <h2 style="font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">Search Verified Trail Information</h2>
+            <p style="color: #64748b; margin-bottom: 2rem;">Find official trail data, camping locations, and outdoor recreation information from trusted government sources</p>
             
             <div class="search-input-wrapper">
                 <input 
                     type="text" 
                     id="searchInput" 
-                    placeholder="Search by trail name, location, difficulty... e.g., 'Appalachian Trail hiking' or 'Yosemite camping'"
+                    placeholder="Search trails by name, location, difficulty... e.g., 'Yosemite hiking' or 'Appalachian Trail camping'"
                     autocomplete="off"
                 >
-                <button class="search-btn" onclick="performSearch()">Search</button>
+                <button class="search-btn" onclick="performSearch()">Search Trails</button>
             </div>
 
             <!-- Loading State -->
             <div class="loading" id="loadingState">
                 <div class="spinner"></div>
-                <p>Searching through AI-generated content...</p>
+                <p>Searching through verified trail data...</p>
             </div>
 
             <!-- Results -->
@@ -413,7 +451,7 @@
 
     <!-- Page Grid (AI Generated Pages) -->
     <section class="page-grid" id="pageGrid">
-        <!-- AI-generated pages will be loaded here -->
+        <!-- Trail pages will be loaded here -->
     </section>
 
     <!-- Footer -->
@@ -425,7 +463,14 @@
             <a href="/terms-of-service">Terms of Service</a>
             <a href="/contact">Contact</a>
         </div>
-        <p style="opacity: 0.7;">© 2026 jujoja.com - The Hiking & Outdoors Programmatic | Powered by Local LLMs & n8n AI Workflows</p>
+        
+        <!-- Official Data Sources -->
+        <p style="margin-top: 2rem; opacity: 0.8; font-size: 0.9rem;">
+            <strong>Data Provided by:</strong><br>
+            🏛️ National Park Service (NPS) API | 🗺️ USGS National Digital Trails | 🏕️ Recreation.gov RIDB
+        </p>
+        
+        <p style="opacity: 0.7; margin-top: 1rem;">© 2026 jujoja.com - The Hiking & Outdoors Programmatic</p>
     </footer>
 
     <!-- Scripts -->
