@@ -1,14 +1,54 @@
-// Initialize MiniSearch index from JSON file
+// public/js/search.js - COMPLETELY FIXED VERSION
+
 let miniSearch;
-const INDEX_URL = '/search-index.json';
+const INDEX_URL = '/pages.json'; // ✅ CORRECT PATH for Vercel outputDirectory "public"
+const ARTICLES = [];
 
 async function initSearch() {
+    console.log('🔍 Initializing search from:', INDEX_URL);
+    
     try {
         const response = await fetch(INDEX_URL);
-        if (!response.ok) throw new Error('Failed to load search index');
         
-        const articles = await response.json();
-        console.log(`Loaded ${articles.length} articles for indexing`);
+        if (!response.ok) {
+            console.error('❌ HTTP Error:', response.status, response.statusText);
+            throw new Error(`Failed to load index: ${response.status}`);
+        }
+        
+        // Check if we got HTML (404 error) instead of JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('❌ Wrong content type:', contentType);
+            throw new Error('pages.json is not a valid JSON file');
+        }
+        
+        const data = await response.json();
+        
+        console.log('📄 Loaded pages.json successfully');
+        console.log('📊 Total pages:', data.pages?.length || 0);
+        console.log('📋 Data structure:', Object.keys(data));
+        
+        // Check if pages exist in the data
+        const pages = data.pages || [];
+        
+        if (pages.length === 0) {
+            console.warn('⚠️ No pages found in pages.json');
+            showNoPagesMessage();
+            return;
+        }
+        
+        // Convert pages to articles format for MiniSearch
+        ARTICLES.push(...pages.map((page, index) => ({
+            id: page.id || `page-${index}`,
+            title: page.title || 'Untitled',
+            content: page.content || '',
+            trailName: page.trailName || '',
+            location: page.location || '',
+            difficulty: page.difficulty || 'Unknown',
+            length: page.length || ''
+        })));
+        
+        console.log('📝 Articles prepared for indexing:', ARTICLES.length);
         
         // Initialize MiniSearch with field boosting
         miniSearch = window.MiniSearch({
@@ -21,24 +61,39 @@ async function initSearch() {
         });
         
         // Index all articles
-        await miniSearch.addAll(articles);
-        console.log('Search index initialized successfully');
+        await miniSearch.addAll(ARTICLES);
+        
+        console.log('✅ Search index initialized successfully');
+        console.log('🔍 Ready to search!');
         
     } catch (error) {
-        console.error('Error initializing search:', error);
-        showError('Failed to load search index. Please try again later.');
+        console.error('❌ Error initializing search:', error);
+        showError(`Failed to load search data: ${error.message}`);
     }
 }
 
 // Perform search
 async function performSearch() {
-    const query = document.getElementById('searchInput').value.trim();
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) {
+        console.error('❌ Search input not found');
+        return;
+    }
+    
+    const query = searchInput.value.trim();
     if (!query) return;
     
+    console.log('🔍 Searching for:', query);
+    
     // Show loading state
-    document.getElementById('loadingState').style.display = 'block';
-    document.getElementById('searchResults').innerHTML = '';
-    document.getElementById('searchResults').style.display = 'block';
+    const loadingState = document.getElementById('loadingState');
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (loadingState) loadingState.style.display = 'block';
+    if (resultsDiv) {
+        resultsDiv.innerHTML = '';
+        resultsDiv.style.display = 'block';
+    }
     
     try {
         const results = await miniSearch.search(query, {
@@ -47,29 +102,36 @@ async function performSearch() {
             boost: { title: 2 }
         });
         
-        displayResults(results);
+        console.log('📊 Search results:', results.length);
+        
+        if (resultsDiv) displayResults(results);
     } catch (error) {
-        console.error('Search error:', error);
-        showError('Search failed. Please try again.');
+        console.error('❌ Search error:', error);
+        if (resultsDiv) showError('Search failed. Please try again.');
     } finally {
-        document.getElementById('loadingState').style.display = 'none';
+        if (loadingState) loadingState.style.display = 'none';
     }
 }
 
 // Display search results with highlighting
 function displayResults(results) {
     const container = document.getElementById('searchResults');
+    if (!container) {
+        console.error('❌ Results container not found');
+        return;
+    }
+    
     container.innerHTML = '';
     
     if (results.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #64748b;">No results found. Try different keywords.</p>';
+        container.innerHTML = '<p style="text-align: center; color: #64748b;">No results found for "' + escapeHtml(document.getElementById('searchInput').value) + '". Try different keywords.</p>';
         return;
     }
     
     const fragment = document.createDocumentFragment();
     
     results.forEach((result, index) => {
-        const article = articles[result.id];
+        const article = ARTICLES[result.id];
         if (!article) return;
         
         // Create result card
@@ -112,6 +174,7 @@ function highlightSearchTerms(text, query) {
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
@@ -125,17 +188,36 @@ function escapeRegExp(string) {
 // Show error message
 function showError(message) {
     const container = document.getElementById('searchResults');
-    container.innerHTML = `<p style="text-align: center; color: #ef4444;">${escapeHtml(message)}</p>`;
+    if (container) {
+        container.innerHTML = `<p style="text-align: center; color: #ef4444;">${escapeHtml(message)}</p>`;
+    }
+}
+
+// Show no pages message
+function showNoPagesMessage() {
+    const container = document.getElementById('searchResults');
+    if (container) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <h3 style="color: var(--primary);">🏔️ Trail Data Loading</h3>
+                <p style="color: #64748b;">Our system is currently aggregating verified trail information from official government sources.</p>
+                <p style="margin-top: 1rem; color: #94a3b8;">Check back later for more hiking trails and outdoor adventures!</p>
+            </div>
+        `;
+    }
 }
 
 // Real-time search as user types (debounced)
 let searchTimeout;
-document.getElementById('searchInput').addEventListener('input', function(e) {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        performSearch();
-    }, 300); // 300ms debounce
-});
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            performSearch();
+        }, 300); // 300ms debounce
+    });
+}
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', initSearch);

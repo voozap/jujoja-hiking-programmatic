@@ -486,248 +486,254 @@
         <p style="opacity: 0.7;">© 2026 jujoja.com - The Hiking & Outdoors Programmatic | Powered by Local LLMs & n8n AI Workflows</p>
     </footer>
 
-    <!-- Scripts -->
-    <script src="/js/search.js"></script>
-    <script src="/js/marquee.js"></script>
-    <script>
-        // Search-specific initialization
-        let currentPage = 1;
-        let resultsPerPage = 12;
-        let filteredResults = [];
+<!-- Scripts -->
+<script src="/js/search.js"></script>
+<script src="/js/marquee.js"></script>
+<script>
+    // Define articles variable that search.js expects
+    let articles = [];
+    
+    // Search-specific initialization
+    let currentPage = 1;
+    let resultsPerPage = 12;
+    let filteredResults = [];
 
-        window.addEventListener('DOMContentLoaded', function() {
-            initSearch();
-            
-            // Get URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const query = urlParams.get('q');
-            
-            if (query) {
-                document.getElementById('searchQueryDisplay').textContent = `Searching for: "${query}"`;
-                performSearch(query);
-            }
-        });
+    window.addEventListener('DOMContentLoaded', function() {
+        initSearch();
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('q');
+        
+        if (query) {
+            document.getElementById('searchQueryDisplay').textContent = `Searching for: "${query}"`;
+            performSearch(query);
+        } else {
+            showAllResults();
+        }
+    });
 
-        // Perform search with URL parameters
-        function performSearch(query, page = 1) {
-            currentPage = page;
-            
-            document.getElementById('loadingState').style.display = 'block';
-            document.getElementById('resultsGrid').innerHTML = '';
-            document.getElementById('noResults').style.display = 'none';
-            document.getElementById('pagination').style.display = 'none';
-            document.getElementById('searchQueryDisplay').textContent = query ? `Searching for: "${query}"` : 'All hiking content';
-            
-            // Store search term in localStorage for persistence
-            if (query) {
-                localStorage.setItem('jujoja_lastSearch', query);
-            }
-
-            setTimeout(() => {
-                document.getElementById('loadingState').style.display = 'none';
-                
-                if (!query) {
-                    showAllResults();
-                    return;
-                }
-                
-                searchAndFilter(query);
-            }, 300);
+    // Perform search with URL parameters
+    function performSearch(query, page = 1) {
+        currentPage = page;
+        
+        document.getElementById('loadingState').style.display = 'block';
+        document.getElementById('resultsGrid').innerHTML = '';
+        document.getElementById('noResults').style.display = 'none';
+        document.getElementById('pagination').style.display = 'none';
+        document.getElementById('searchQueryDisplay').textContent = query ? `Searching for: "${query}"` : 'All hiking content';
+        
+        // Store search term in localStorage for persistence
+        if (query) {
+            localStorage.setItem('jujoja_lastSearch', query);
         }
 
-        // Search and filter results
-        function searchAndFilter(query) {
-            const results = miniSearch.search(query, {
-                fuzzy: 0.2,
-                prefix: true,
-                boost: { title: 2 }
-            });
+        setTimeout(() => {
+            document.getElementById('loadingState').style.display = 'none';
             
-            filteredResults = results.map(id => articles[id]);
-            
-            // Apply filters
-            applyFiltersToResults();
-            
-            displayResults(filteredResults.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage));
-        }
-
-        // Show all results (no search query)
-        function showAllResults() {
-            filteredResults = articles;
-            applyFiltersToResults();
-            displayResults(filteredResults.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage));
-        }
-
-        // Apply filters to results
-        function applyFiltersToResults() {
-            const difficultyFilter = document.getElementById('difficultyFilter').value;
-            const locationFilter = document.getElementById('locationFilter').value.toLowerCase();
-            
-            filteredResults = filteredResults.filter(page => {
-                // Filter by difficulty
-                if (difficultyFilter && page.difficulty !== difficultyFilter) {
-                    return false;
-                }
-                
-                // Filter by location
-                if (locationFilter && !page.location?.toLowerCase().includes(locationFilter)) {
-                    return false;
-                }
-                
-                return true;
-            });
-            
-            updateResultsCount();
-        }
-
-        // Apply filters button
-        function applyFilters() {
-            currentPage = 1;
-            performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
-                document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '');
-        }
-
-        // Clear filters
-        function clearFilters() {
-            document.getElementById('difficultyFilter').value = '';
-            document.getElementById('locationFilter').value = '';
-            currentPage = 1;
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.delete('q');
-            urlParams.delete('page');
-            urlParams.delete('difficulty');
-            urlParams.delete('location');
-            
-            window.history.replaceState({}, '', `/search.html?${urlParams.toString()}`);
-            
-            performSearch();
-        }
-
-        // Update results count
-        function updateResultsCount() {
-            const displayQuery = document.getElementById('searchQueryDisplay').textContent;
-            const hasQuery = displayQuery.includes('"');
-            
-            document.getElementById('resultsCount').textContent = 
-                hasQuery ? `${filteredResults.length} results found` : `${filteredResults.length} pages available`;
-        }
-
-        // Display results
-        function displayResults(results) {
-            const grid = document.getElementById('resultsGrid');
-            grid.innerHTML = '';
-            
-            if (results.length === 0) {
-                document.getElementById('noResults').style.display = 'block';
-                document.getElementById('pagination').style.display = 'none';
-                return;
-            }
-            
-            results.forEach((result, index) => {
-                const card = document.createElement('div');
-                card.className = 'result-card fade-in';
-                card.style.animationDelay = `${index * 0.1}s`;
-                
-                // Get difficulty badge class
-                let badgeClass = 'badge';
-                if (result.difficulty === 'Easy') badgeClass = 'badge-easy';
-                else if (result.difficulty === 'Medium') badgeClass = 'badge-medium';
-                else if (result.difficulty === 'Hard') badgeClass = 'badge-hard';
-                
-                card.innerHTML = `
-                    <h3 class="result-title">${escapeHtml(result.title)}</h3>
-                    <p class="result-excerpt">${highlightSearchTerms(result.content, document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, ''))}</p>
-                    <div class="result-meta">
-                        <span>📍 ${escapeHtml(result.location || 'Unknown')}</span>
-                        <span>🥾 <span class="${badgeClass} badge">${escapeHtml(result.difficulty || 'N/A')}</span></span>
-                        <span>📏 ${escapeHtml(result.length || 'Unknown')} miles</span>
-                    </div>
-                `;
-                
-                card.addEventListener('click', () => {
-                    viewFullPage(result);
-                });
-                
-                grid.appendChild(card);
-            });
-            
-            // Show pagination if needed
-            displayPagination();
-        }
-
-        // Display pagination controls
-        function displayPagination() {
-            const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredResults.length / resultsPerPage) || 1;
-            
-            if (totalPages <= 1) {
-                pagination.style.display = 'none';
-                return;
-            }
-            
-            pagination.style.display = 'flex';
-            pagination.innerHTML = '';
-            
-            // Previous button
-            const prevBtn = document.createElement('button');
-            prevBtn.className = 'page-btn';
-            prevBtn.textContent = 'Previous';
-            prevBtn.disabled = currentPage === 1;
-            prevBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
-                document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', currentPage - 1);
-            pagination.appendChild(prevBtn);
-            
-            // Page numbers
-            for (let i = 1; i <= totalPages; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                pageBtn.textContent = i;
-                pageBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
-                    document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', i);
-                pagination.appendChild(pageBtn);
-            }
-            
-            // Next button
-            const nextBtn = document.createElement('button');
-            nextBtn.className = 'page-btn';
-            nextBtn.textContent = 'Next';
-            nextBtn.disabled = currentPage === totalPages;
-            nextBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
-                document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', currentPage + 1);
-            pagination.appendChild(nextBtn);
-        }
-
-        // View full page
-        function viewFullPage(page) {
-            const url = `/page/${encodeURIComponent(page.id)}.html`;
-            
-            fetch(url).then(response => {
-                if (response.ok) {
-                    window.open(url, '_blank');
-                } else {
-                    alert(`Page not found: ${page.title}. Our AI is still generating content!`);
-                }
-            }).catch(() => {
-                alert('Page loading in progress. Check back later!');
-            });
-        }
-
-        // Initialize on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            initSearch();
-            
-            // Get URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const query = urlParams.get('q');
-            
-            if (query) {
-                document.getElementById('searchQueryDisplay').textContent = `Searching for: "${query}"`;
-                performSearch(query);
-            } else {
+            if (!query) {
                 showAllResults();
+                return;
             }
+            
+            searchAndFilter(query);
+        }, 300);
+    }
+
+    // Search and filter results
+    function searchAndFilter(query) {
+        const results = miniSearch.search(query, {
+            fuzzy: 0.2,
+            prefix: true,
+            boost: { title: 2 }
         });
-    </script>
+        
+        filteredResults = results.map(id => articles[id]);
+        
+        // Apply filters
+        applyFiltersToResults();
+        
+        displayResults(filteredResults.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage));
+    }
+
+    // Show all results (no search query)
+    function showAllResults() {
+        filteredResults = articles;
+        applyFiltersToResults();
+        displayResults(filteredResults.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage));
+    }
+
+    // Apply filters to results
+    function applyFiltersToResults() {
+        const difficultyFilter = document.getElementById('difficultyFilter').value;
+        const locationFilter = document.getElementById('locationFilter').value.toLowerCase();
+        
+        filteredResults = filteredResults.filter(page => {
+            // Filter by difficulty
+            if (difficultyFilter && page.difficulty !== difficultyFilter) {
+                return false;
+            }
+            
+            // Filter by location
+            if (locationFilter && !page.location?.toLowerCase().includes(locationFilter)) {
+                return false;
+            }
+            
+            return true;
+        });
+        
+        updateResultsCount();
+    }
+
+    // Apply filters button
+    function applyFilters() {
+        currentPage = 1;
+        performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
+            document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '');
+    }
+
+    // Clear filters
+    function clearFilters() {
+        document.getElementById('difficultyFilter').value = '';
+        document.getElementById('locationFilter').value = '';
+        currentPage = 1;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete('q');
+        urlParams.delete('page');
+        urlParams.delete('difficulty');
+        urlParams.delete('location');
+        
+        window.history.replaceState({}, '', `/search.html?${urlParams.toString()}`);
+        
+        performSearch();
+    }
+
+    // Update results count
+    function updateResultsCount() {
+        const displayQuery = document.getElementById('searchQueryDisplay').textContent;
+        const hasQuery = displayQuery.includes('"');
+        
+        document.getElementById('resultsCount').textContent = 
+            hasQuery ? `${filteredResults.length} results found` : `${filteredResults.length} pages available`;
+    }
+
+    // Display results
+    function displayResults(results) {
+        const grid = document.getElementById('resultsGrid');
+        grid.innerHTML = '';
+        
+        if (results.length === 0) {
+            document.getElementById('noResults').style.display = 'block';
+            document.getElementById('pagination').style.display = 'none';
+            return;
+        }
+        
+        results.forEach((result, index) => {
+            const card = document.createElement('div');
+            card.className = 'result-card fade-in';
+            card.style.animationDelay = `${index * 0.1}s`;
+            
+            // Get difficulty badge class
+            let badgeClass = 'badge';
+            if (result.difficulty === 'Easy') badgeClass = 'badge-easy';
+            else if (result.difficulty === 'Medium') badgeClass = 'badge-medium';
+            else if (result.difficulty === 'Hard') badgeClass = 'badge-hard';
+            
+            card.innerHTML = `
+                <h3 class="result-title">${escapeHtml(result.title)}</h3>
+                <p class="result-excerpt">${highlightSearchTerms(result.content, document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, ''))}</p>
+                <div class="result-meta">
+                    <span>📍 ${escapeHtml(result.location || 'Unknown')}</span>
+                    <span>🥾 <span class="${badgeClass} badge">${escapeHtml(result.difficulty || 'N/A')}</span></span>
+                    <span>📏 ${escapeHtml(result.length || 'Unknown')} miles</span>
+                </div>
+            `;
+            
+            card.addEventListener('click', () => {
+                viewFullPage(result);
+            });
+            
+            grid.appendChild(card);
+        });
+        
+        // Show pagination if needed
+        displayPagination();
+    }
+
+    // Display pagination controls
+    function displayPagination() {
+        const pagination = document.getElementById('pagination');
+        const totalPages = Math.ceil(filteredResults.length / resultsPerPage) || 1;
+        
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+            return;
+        }
+        
+        pagination.style.display = 'flex';
+        pagination.innerHTML = '';
+        
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'page-btn';
+        prevBtn.textContent = 'Previous';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
+            document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', currentPage - 1);
+        pagination.appendChild(prevBtn);
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
+                document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', i);
+            pagination.appendChild(pageBtn);
+        }
+        
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'page-btn';
+        nextBtn.textContent = 'Next';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => performSearch(document.getElementById('searchQueryDisplay').textContent.includes('"') ? 
+            document.getElementById('searchQueryDisplay').textContent.replace(/".*"/, '') : '', currentPage + 1);
+        pagination.appendChild(nextBtn);
+    }
+
+    // View full page
+    function viewFullPage(page) {
+        const url = `/page/${encodeURIComponent(page.id)}.html`;
+        
+        fetch(url).then(response => {
+            if (response.ok) {
+                window.open(url, '_blank');
+            } else {
+                alert(`Page not found: ${page.title}. Our AI is still generating content!`);
+            }
+        }).catch(() => {
+            alert('Page loading in progress. Check back later!');
+        });
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        initSearch();
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('q');
+        
+        if (query) {
+            document.getElementById('searchQueryDisplay').textContent = `Searching for: "${query}"`;
+            performSearch(query);
+        } else {
+            showAllResults();
+        }
+    });
+</script>
+
 </body>
 </html>
