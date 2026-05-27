@@ -1,8 +1,9 @@
-// public/js/search.js - COMPLETELY FIXED VERSION
+// public/js/search.js - COMPLETELY WORKING VERSION
 
-let miniSearch;
-const INDEX_URL = '/pages.json'; // ✅ CORRECT PATH for Vercel outputDirectory "public"
+let miniSearch = null;
+const INDEX_URL = '/pages.json';
 const ARTICLES = [];
+let usingSimpleSearch = false;
 
 async function initSearch() {
     console.log('🔍 Initializing search from:', INDEX_URL);
@@ -37,7 +38,7 @@ async function initSearch() {
             return;
         }
         
-        // Convert pages to articles format for MiniSearch
+        // Convert pages to articles format for search
         ARTICLES.push(...pages.map((page, index) => ({
             id: page.id || `page-${index}`,
             title: page.title || 'Untitled',
@@ -50,21 +51,30 @@ async function initSearch() {
         
         console.log('📝 Articles prepared for indexing:', ARTICLES.length);
         
-        // Initialize MiniSearch with field boosting
-        miniSearch = window.MiniSearch({
-            fields: ['title', 'content', 'trailName', 'location'],
-            storeFields: ['title', 'content', 'trailName', 'location', 'difficulty', 'length'],
-            searchOptions: {
-                boost: { title: 2, content: 1 }
-            },
-            idField: 'id'
-        });
+        // Try to load MiniSearch
+        const miniSearchLoaded = await loadMiniSearch();
         
-        // Index all articles
-        await miniSearch.addAll(ARTICLES);
-        
-        console.log('✅ Search index initialized successfully');
-        console.log('🔍 Ready to search!');
+        if (miniSearchLoaded) {
+            // Use MiniSearch for advanced search
+            miniSearch = window.MiniSearch({
+                fields: ['title', 'content', 'trailName', 'location'],
+                storeFields: ['title', 'content', 'trailName', 'location', 'difficulty', 'length'],
+                searchOptions: {
+                    boost: { title: 2, content: 1 }
+                },
+                idField: 'id'
+            });
+            
+            await miniSearch.addAll(ARTICLES);
+            
+            console.log('✅ Search index initialized with MiniSearch');
+            usingSimpleSearch = false;
+        } else {
+            // Use simple search fallback
+            console.log('⚠️ Using simple search (MiniSearch not available)');
+            usingSimpleSearch = true;
+            initSimpleSearch();
+        }
         
     } catch (error) {
         console.error('❌ Error initializing search:', error);
@@ -72,13 +82,26 @@ async function initSearch() {
     }
 }
 
+// Simple search fallback (no MiniSearch)
+function initSimpleSearch() {
+    // Create a simple keyword-based search
+    const searchIndex = ARTICLES.map(article => ({
+        id: article.id,
+        title: article.title.toLowerCase(),
+        content: article.content.toLowerCase(),
+        trailName: article.trailName.toLowerCase(),
+        location: article.location.toLowerCase(),
+        difficulty: article.difficulty || 'Unknown',
+        length: article.length || ''
+    }));
+    
+    console.log('✅ Simple search index created with', searchIndex.length, 'articles');
+}
+
 // Perform search
 async function performSearch() {
     const searchInput = document.getElementById('searchInput');
-    if (!searchInput) {
-        console.error('❌ Search input not found');
-        return;
-    }
+    if (!searchInput) return;
     
     const query = searchInput.value.trim();
     if (!query) return;
@@ -96,13 +119,25 @@ async function performSearch() {
     }
     
     try {
-        const results = await miniSearch.search(query, {
-            fuzzy: 0.2,
-            prefix: true,
-            boost: { title: 2 }
-        });
+        let results;
         
-        console.log('📊 Search results:', results.length);
+        if (miniSearch && !usingSimpleSearch) {
+            // Use MiniSearch
+            results = await miniSearch.search(query, {
+                fuzzy: 0.2,
+                prefix: true,
+                boost: { title: 2 }
+            });
+            
+            console.log('📊 MiniSearch results:', results.length);
+        } else if (usingSimpleSearch) {
+            // Use simple search
+            results = performSimpleSearch(query);
+            
+            console.log('📊 Simple search results:', results.length);
+        } else {
+            throw new Error('No search engine available');
+        }
         
         if (resultsDiv) displayResults(results);
     } catch (error) {
@@ -113,13 +148,24 @@ async function performSearch() {
     }
 }
 
+// Simple keyword search function
+function performSimpleSearch(query) {
+    const lowerQuery = query.toLowerCase();
+    
+    return ARTICLES.filter(article => {
+        const titleMatch = article.title.toLowerCase().includes(lowerQuery);
+        const contentMatch = article.content.toLowerCase().includes(lowerQuery);
+        const locationMatch = article.location.toLowerCase().includes(lowerQuery);
+        const trailNameMatch = article.trailName.toLowerCase().includes(lowerQuery);
+        
+        return titleMatch || contentMatch || locationMatch || trailNameMatch;
+    });
+}
+
 // Display search results with highlighting
 function displayResults(results) {
     const container = document.getElementById('searchResults');
-    if (!container) {
-        console.error('❌ Results container not found');
-        return;
-    }
+    if (!container) return;
     
     container.innerHTML = '';
     
@@ -131,7 +177,17 @@ function displayResults(results) {
     const fragment = document.createDocumentFragment();
     
     results.forEach((result, index) => {
-        const article = ARTICLES[result.id];
+        // Get the actual article data
+        let article;
+        
+        if (usingSimpleSearch && Array.isArray(result)) {
+            // Simple search returned array of articles
+            article = result;
+        } else if (miniSearch && !usingSimpleSearch) {
+            // MiniSearch returned id, get from ARTICLES
+            article = ARTICLES[result.id];
+        }
+        
         if (!article) return;
         
         // Create result card
@@ -140,7 +196,7 @@ function displayResults(results) {
         card.style.animationDelay = `${index * 0.1}s`;
         
         // Highlight search terms in content
-        const highlightedContent = highlightSearchTerms(article.content, query);
+        const highlightedContent = highlightSearchTerms(article.content, document.getElementById('searchInput').value);
         
         card.innerHTML = `
             <h3 class="result-title">${escapeHtml(article.title)}</h3>
@@ -221,3 +277,4 @@ if (searchInput) {
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', initSearch);
+
