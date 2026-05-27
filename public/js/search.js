@@ -51,8 +51,17 @@ async function initSearch() {
         
         console.log('📝 Articles prepared for indexing:', ARTICLES.length);
         
-        // Try to load MiniSearch
-        const miniSearchLoaded = await loadMiniSearch();
+        // Load MiniSearch first, then create instance
+let MiniSearch;
+async function initSearch() {
+    const response = await fetch('https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js');
+    const module = await response.json();
+    MiniSearch = module.MiniSearch || module.default; // Handle both UMD formats
+    
+    miniSearch = new MiniSearch({ /* your config */ });
+    
+    // Now you can perform search...
+}
         
         if (miniSearchLoaded) {
             // Use MiniSearch for advanced search
