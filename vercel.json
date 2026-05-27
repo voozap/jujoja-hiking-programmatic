@@ -60,14 +60,6 @@
       ]
     }
   ],
-  
-  "crons": [
-    {
-      "path": "/api/generate-page.js",
-      "schedule": "0 */6 * * *"
-    }
-  ],
-  
   "env": {
     "OLLAMA_API_URL": "http://localhost:11434",
     "N8N_WEBHOOK_URL": "https://your-n8n-instance.com/webhook/hiking"
