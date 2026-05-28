@@ -1,16 +1,7 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "installCommand": null,
   "outputDirectory": "public",
   
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/"
-    }
-  ],
-
   "headers": [
     {
       "source": "/pages.json",

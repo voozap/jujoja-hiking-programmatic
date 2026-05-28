@@ -161,7 +161,9 @@ function truncateText(text, maxLength) {
 }
 
 function viewFullPage(page) {
-    const url = `/page/${encodeURIComponent(page.id)}.html`;
+    // Pass the ID securely through the URL parameter
+    window.location.href = `/article.html?id=${encodeURIComponent(page.id)}`;
+}
     
     fetch(url).then(response => {
         if (response.ok) {
@@ -172,7 +174,7 @@ function viewFullPage(page) {
     }).catch(() => {
         alert('Trail information loading in progress. Check back later!');
     });
-}
+
 
 function showErrorLoading() {
     const grid = document.getElementById('pageGrid');

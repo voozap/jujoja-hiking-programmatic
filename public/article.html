@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Trail... | jujoja.com</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1a5f7a;
+            --secondary: #2d8b6e;
+            --accent: #4a9c6d;
+            --dark: #0d1b2a;
+            --light: #f8f9fa;
+            --text: #334155;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: var(--dark);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .article-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 2rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .article-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">🏔️ jujoja.com</a>
+        </div>
+    </nav>
+
+    <div class="article-container" id="articleBody">
+        <a href="javascript:history.back()" class="back-btn">← Back to Search</a>
+        <h1 class="article-title" id="title">Loading...</h1>
+        <div class="article-meta" id="meta"></div>
+        <div class="article-content" id="content">Fetching trail data...</div>
+    </div>
+
+    <script>
+        async function loadArticle() {
+            // Get the ID from the URL (e.g., ?id=trail-001)
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('id');
+
+            if (!articleId) {
+                document.getElementById('title').textContent = "Article Not Found";
+                document.getElementById('content').textContent = "No trail ID was provided.";
+                return;
+            }
+
+            try {
+                // Fetch the database
+                const response = await fetch('/pages.json');
+                const data = await response.json();
+                
+                // Find the matching article
+                const article = data.pages.find(p => p.id === articleId);
+
+                if (article) {
+                    // Inject the data into the HTML
+                    document.title = `${article.title} | jujoja.com`;
+                    document.getElementById('title').textContent = article.title;
+                    document.getElementById('content').innerHTML = `<p>${article.content}</p>`;
+                    
+                    document.getElementById('meta').innerHTML = `
+                        <span>📍 ${article.location || 'Unknown'}</span>
+                        <span>🥾 ${article.difficulty || 'N/A'}</span>
+                        <span>📏 ${article.length || 'Unknown'} miles</span>
+                    `;
+                } else {
+                    document.getElementById('title').textContent = "Trail Not Found";
+                    document.getElementById('content').textContent = "We couldn't find the trail you're looking for. Our AI might still be generating it!";
+                }
+            } catch (error) {
+                console.error("Error loading article:", error);
+                document.getElementById('title').textContent = "Connection Error";
+                document.getElementById('content').textContent = "Failed to load the trail database. Please try again.";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadArticle);
+    </script>
+</body>
+</html>

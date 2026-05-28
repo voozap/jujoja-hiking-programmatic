@@ -547,6 +547,10 @@
             renderCurrentPage();
         }, 300);
     }
+    function viewFullPage(page) {
+    // Pass the ID securely through the URL parameter
+    window.location.href = `/article.html?id=${encodeURIComponent(page.id)}`;
+}
 
     function showAllResults() {
         filteredResults = [...ARTICLES];
