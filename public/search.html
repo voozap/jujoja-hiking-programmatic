@@ -501,7 +501,6 @@
         const query = urlParams.get('q');
         
         if (query) {
-            // Populate the new search box with the URL parameter
             document.getElementById('pageSearchInput').value = query;
             document.getElementById('searchQueryDisplay').textContent = `Searching for: "${query}"`;
             performLocalSearch(query);
@@ -516,7 +515,6 @@
         document.getElementById('loadingState').style.display = 'block';
         document.getElementById('resultsGrid').innerHTML = '';
         document.getElementById('noResults').style.display = 'none';
-        document.getElementById('pagination').style.display = 'none';
 
         setTimeout(() => {
             document.getElementById('loadingState').style.display = 'none';
@@ -526,31 +524,24 @@
                 return;
             }
             
-            // Safety Check: Did MiniSearch actually load?
             if (!miniSearch) {
-                console.error("Search engine failed to load. Check your network or CSP.");
-                document.getElementById('noResults').innerHTML = "<h3>Search Engine Error</h3><p>Could not load the search tool. Please refresh the page.</p>";
+                console.error("Search engine failed to load.");
+                document.getElementById('noResults').innerHTML = "<h3>Search Engine Error</h3><p>Could not load the search tool.</p>";
                 document.getElementById('noResults').style.display = 'block';
                 return;
             }
 
-            // 3. Query the MiniSearch index
             const results = miniSearch.search(query, {
-                fuzzy: 0.2, // Allows for slight typos like "yosemit"
+                fuzzy: 0.2,
                 prefix: true
             });
             
-            // 4. Map the string IDs back to the real article objects
             filteredResults = results.map(res => ARTICLES.find(a => a.id === res.id));
             
             applyFiltersToResults();
             renderCurrentPage();
         }, 300);
     }
-    function viewFullPage(page) {
-    // Pass the ID securely through the URL parameter
-    window.location.href = `/article.html?id=${encodeURIComponent(page.id)}`;
-}
 
     function showAllResults() {
         filteredResults = [...ARTICLES];
@@ -574,10 +565,8 @@
 
     function applyFilters() {
         currentPage = 1;
-        // Grab the query from the new text box instead of the subtitle text
         const currentQuery = document.getElementById('pageSearchInput').value.trim();
         
-        // Update the URL silently so the user can share/refresh the link
         const url = new URL(window.location);
         if (currentQuery) {
             url.searchParams.set('q', currentQuery);
@@ -594,6 +583,7 @@
     function clearFilters() {
         document.getElementById('difficultyFilter').value = '';
         document.getElementById('locationFilter').value = '';
+        document.getElementById('pageSearchInput').value = '';
         applyFilters();
     }
 
@@ -622,15 +612,14 @@
             const card = document.createElement('div');
             card.className = 'result-card fade-in';
             card.style.animationDelay = `${index * 0.1}s`;
+            card.style.cursor = 'pointer'; // 👈 Makes the mouse a pointer hand
             
             let badgeClass = 'badge';
             if (result.difficulty === 'Easy') badgeClass = 'badge-easy';
             else if (result.difficulty === 'Medium') badgeClass = 'badge-medium';
             else if (result.difficulty === 'Hard') badgeClass = 'badge-hard';
             
-            const rawText = document.getElementById('searchQueryDisplay').textContent || "";
-            const match = rawText.match(/"([^"]+)"/);
-            const currentQuery = match ? match[1] : '';
+            const currentQuery = document.getElementById('pageSearchInput').value.trim();
             
             card.innerHTML = `
                 <h3 class="result-title">${escapeHtml(result.title)}</h3>
@@ -641,8 +630,19 @@
                     <span>📏 ${escapeHtml(result.length || 'Unknown')} miles</span>
                 </div>
             `;
+            
+            // 👈 This explicitly connects the click event to the specific card
+            card.addEventListener('click', () => {
+                viewFullPage(result);
+            });
+
             grid.appendChild(card);
         });
+    }
+
+    // 👈 The master routing function, placed correctly outside the rendering loop
+    function viewFullPage(page) {
+        window.location.href = `/article.html?id=${encodeURIComponent(page.id)}`;
     }
 </script>
 
