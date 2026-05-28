@@ -19,12 +19,12 @@ async function initSearch() {
         ARTICLES.push(...(data.pages || []));
         
         if (window.MiniSearch) {
-            // Set up the MiniSearch engine
             miniSearch = new window.MiniSearch({
-                fields: ['title', 'content', 'trailName', 'location'],
+                // ADDED 'difficulty' below:
+                fields: ['title', 'content', 'trailName', 'location', 'difficulty'],
                 storeFields: ['id', 'title', 'content', 'trailName', 'location', 'difficulty', 'length'],
                 searchOptions: { boost: { title: 2 } },
-                idField: 'id' // Matches "trail-001" etc.
+                idField: 'id' 
             });
             
             miniSearch.addAll(ARTICLES);
