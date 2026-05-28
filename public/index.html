@@ -3,19 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- CSP Meta Tag - FIXED -->
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob: https:;">
+    
     <title>The Hiking & Outdoors Programmatic | jujoja.com</title>
-    <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js"></script>
-    <meta name="description" content="Official hiking trails, outdoor adventures, and recreation data from NPS, USGS, and federal sources">
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    style-src 'self' https://fonts.googleapis.com;
-    font-src 'self' https://fonts.gstatic.com;
-    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
-    img-src 'self' data: blob: https:;
-">
-
+    <meta name="description" content="Official hiking trails, outdoor adventures, and recreation data from NPS, USGS, and federal sources">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏔️</text></svg>">
@@ -24,9 +20,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- MiniSearch for Client-Side Search -->
-    
+    <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js"></script>
+
     <!-- Marquee Library -->
     <link rel="stylesheet" href="/css/marquee.css">
     
