@@ -7,19 +7,16 @@
     <meta name="description" content="Advanced search for hiking trails, camping tips, and outdoor adventures">
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'">
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
     
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- MiniSearch for Client-Side Search -->
+    <script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js"></script>
 
-    
     <!-- Marquee Library -->
     <link rel="stylesheet" href="/css/marquee.css">
     
@@ -495,10 +492,10 @@
     let filteredResults = [];
 
     window.addEventListener('DOMContentLoaded', async function() {
-        // 1. AWAIT the index build so we don't search an empty database
+        // 1. Wait for the index to build
         await initSearch();
         
-        // 2. Read the search term passed from the Home Page URL
+        // 2. Read the search term passed from the Home Page
         const urlParams = new URLSearchParams(window.location.search);
         const query = urlParams.get('q');
         
@@ -526,13 +523,21 @@
                 return;
             }
             
+            // Safety Check: Did MiniSearch actually load?
+            if (!miniSearch) {
+                console.error("Search engine failed to load. Check your network or CSP.");
+                document.getElementById('noResults').innerHTML = "<h3>Search Engine Error</h3><p>Could not load the search tool. Please refresh the page.</p>";
+                document.getElementById('noResults').style.display = 'block';
+                return;
+            }
+
             // 3. Query the MiniSearch index
             const results = miniSearch.search(query, {
-                fuzzy: 0.2,
+                fuzzy: 0.2, // Allows for slight typos like "yosemit"
                 prefix: true
             });
             
-            // 4. FIX: Map string IDs ("trail-001") back to the real article objects
+            // 4. Map the string IDs back to the real article objects
             filteredResults = results.map(res => ARTICLES.find(a => a.id === res.id));
             
             applyFiltersToResults();
@@ -551,7 +556,7 @@
         const locationFilter = document.getElementById('locationFilter').value.toLowerCase();
         
         filteredResults = filteredResults.filter(page => {
-            if (!page) return false; // Safety check
+            if (!page) return false; 
             if (difficultyFilter && page.difficulty !== difficultyFilter) return false;
             if (locationFilter && !(page.location || '').toLowerCase().includes(locationFilter)) return false;
             return true;
