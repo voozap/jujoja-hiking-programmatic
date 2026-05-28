@@ -431,11 +431,13 @@
     <input 
         type="text" 
         id="searchInput" 
-        placeholder="Search trails by name, location, difficulty... e.g., 'Yosemite hiking' or 'Appalachian Trail camping'"
+        placeholder="Search trails by name, location, difficulty... e.g., 'Yosemite'"
         autocomplete="off"
+        onkeypress="if(event.key === 'Enter') { const q = this.value; window.location.href = q ? '/search.html?q=' + encodeURIComponent(q) : '/search.html'; }"
     >
-    <!-- Changed: Now redirects to search.html instead of calling performSearch() -->
-    <button class="search-btn" onclick="window.location.href='/search.html'">Search Trails</button>
+    <button class="search-btn" onclick="const q = document.getElementById('searchInput').value; window.location.href = q ? '/search.html?q=' + encodeURIComponent(q) : '/search.html';">
+        Search Trails
+    </button>
 </div>
 
 
