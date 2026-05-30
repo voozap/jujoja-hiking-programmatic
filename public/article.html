@@ -126,10 +126,6 @@
                         // 4. Update the SEO title tag
                         document.title = `${trail.title} | Hiking Guide`;
                         
-                        // Dynamic length fix (prevents "Varies miles")
-                        const displayLength = (trail.length && (trail.length.toLowerCase().includes('mile') || trail.length.toLowerCase().includes('varies')))
-                            ? trail.length 
-                            : `${trail.length || 'Unknown'} miles`;
                         
                         // 5. Inject the HTML into the page (Metadata moved to the TOP)
                         document.getElementById('articleBody').innerHTML = `
@@ -138,7 +134,7 @@
                             <div class="article-meta" style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; font-weight: 500; color: #64748b;">
                                 <span>📍 ${trail.location || 'Unknown'}</span>
                                 <span>🥾 ${trail.difficulty || 'N/A'}</span>
-                                <span>📏 ${displayLength}</span>
+                                <span>📏 ${trail.length || 'Unknown'} miles</span>
                             </div>
                             
                             <div class="trail-content" style="line-height: 1.8;">

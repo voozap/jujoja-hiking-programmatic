@@ -114,8 +114,19 @@ function getBadges(difficulty, location) {
 }
 
 function truncateText(text, maxLength) {
-    if (!text || text.length <= maxLength) return escapeHtml(text);
-    return escapeHtml(text.substring(0, maxLength)).trim() + '...';
+    if (!text) return '';
+    
+    // 1. Strip out all HTML tags (<h1>, <p>, etc.) so they don't show on the cards
+    const cleanText = text.replace(/<[^>]*>?/gm, '');
+    
+    // 2. Decode any weird HTML entities (like &amp;)
+    const div = document.createElement('div');
+    div.innerHTML = cleanText;
+    const pureText = div.textContent || div.innerText || "";
+    
+    // 3. Truncate the clean text
+    if (pureText.length <= maxLength) return pureText;
+    return pureText.substring(0, maxLength).trim() + '...';
 }
 
 function escapeHtml(text) {
