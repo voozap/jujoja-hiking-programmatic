@@ -108,48 +108,48 @@
     </div>
 
     <script>
-        async function loadArticle() {
-            // Get the ID from the URL (e.g., ?id=trail-001)
+        // This script runs as soon as the page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            // 1. Grab the ID from the URL (e.g., ?id=trail-001)
             const urlParams = new URLSearchParams(window.location.search);
-            const articleId = urlParams.get('id');
-
-            if (!articleId) {
-                document.getElementById('title').textContent = "Article Not Found";
-                document.getElementById('content').textContent = "No trail ID was provided.";
-                return;
-            }
-
-            try {
-                // Fetch the database
-                const response = await fetch('/pages.json');
-                const data = await response.json();
-                
-                // Find the matching article
-                const article = data.pages.find(p => p.id === articleId);
-
-                if (article) {
-                    // Inject the data into the HTML
-                    document.title = `${article.title} | jujoja.com`;
-                    document.getElementById('title').textContent = article.title;
-                    document.getElementById('content').innerHTML = `<p>${article.content}</p>`;
+            const trailId = urlParams.get('id');
+            
+            if (trailId) {
+                try {
+                    // 2. Fetch the database n8n just built
+                    const response = await fetch('/pages.json');
+                    const data = await response.json();
                     
-                    document.getElementById('meta').innerHTML = `
-                        <span>📍 ${article.location || 'Unknown'}</span>
-                        <span>🥾 ${article.difficulty || 'N/A'}</span>
-                        <span>📏 ${article.length || 'Unknown'} miles</span>
-                    `;
-                } else {
-                    document.getElementById('title').textContent = "Trail Not Found";
-                    document.getElementById('content').textContent = "We couldn't find the trail you're looking for. Our AI might still be generating it!";
+                    // 3. Find the exact trail the user clicked on
+                    const trail = data.pages.find(p => p.id === trailId);
+                    
+                    if (trail) {
+                        // 4. Update the SEO title tag
+                        document.title = `${trail.title} | Hiking Guide`;
+                        
+                        // 5. Inject the AI-generated HTML directly into the page!
+                        document.getElementById('articleBody').innerHTML = `
+                            <a href="javascript:history.back()" class="back-btn">← Back to Search</a>
+                            ${trail.content}
+                            
+                            <div class="article-meta" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e2e8f0;">
+                                <span>📍 ${trail.location || 'Unknown'}</span>
+                                <span>🥾 ${trail.difficulty || 'N/A'}</span>
+                                <span>📏 ${trail.length || 'Unknown'}</span>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById('articleBody').innerHTML = "<h1>Trail Not Found</h1><p>Our AI might still be generating this guide!</p>";
+                    }
+                } catch (error) {
+                    console.error("Error loading article:", error);
+                    document.getElementById('articleBody').innerHTML = "<h1>Connection Error</h1><p>Failed to load the trail database.</p>";
                 }
-            } catch (error) {
-                console.error("Error loading article:", error);
-                document.getElementById('title').textContent = "Connection Error";
-                document.getElementById('content').textContent = "Failed to load the trail database. Please try again.";
+            } else {
+                // If there's no ID in the URL, send them back to the homepage
+                window.location.href = '/';
             }
-        }
-
-        window.addEventListener('DOMContentLoaded', loadArticle);
+        });
     </script>
 </body>
 </html>
