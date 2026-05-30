@@ -641,7 +641,7 @@
     }
 
     // 👈 The master routing function, placed correctly outside the rendering loop
-    function viewFullPage(page) {
+   function viewFullPage(page) {
     // Instead of opening a non-existent static page, open a dedicated detail view 
     // or pass an ID parameter to read dynamically from pages.json
     window.location.href = `/?id=${encodeURIComponent(page.id)}`;
