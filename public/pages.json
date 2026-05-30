@@ -1,47 +1,18 @@
 {
-  "version": "1.0",
-  "lastUpdated": "2026-05-27T00:00:00Z",
-  "metadata": {
-    "totalPages": 4,
-    "generatedBy": "Official Data Aggregation System",
-    "dataSource": "NPS API + USGS Trail Data + Recreation.gov RIDB"
-  },
+  "id": "trail-869014EF-C785-42B5-9F7E-891AACBE7ED4",
+  "title": "Boston National Historical Park Hiking Guide",
+  "content": "<h1>Boston National Historical Park Hiking Trail Guide</h1>\n\n<h2>About the Trail</h2>\n<p>The Boston National Historical Park is a unique hiking trail that weaves through the historic city of Boston, Massachusetts. The trail is centered around the Charlestown Navy Yard, where visitors can explore the USS Constitution's history.</p>\n\n<h2>Trail Description and Highlights</h2>\n<ul>\n  <li>Signed titled \"'Old Ironsides' in Dry Dock 1\" marks a significant moment in the USS Constitution's years at the navy yard.</li>\n</ul>\n\n<h2>Practical Tips for Your Visit</h2>\n<p>Be sure to:</p>\n<ul>\n  <li>Check the park's website or contact the visitor center for any trail updates or closures before your visit.</li>\n  <li>Bring a map and compass, as cell phone service may be limited in some areas of the trail.</li>\n</ul>\n\n<h2>Safety Tips</h2>\n<p>To ensure a safe and enjoyable hike:</p>\n<ul>\n  <li>Wear comfortable hiking shoes and dress for the weather.</li>\n  <li>Stay hydrated by bringing plenty of water, especially on warmer days.</li>\n  <li>Avoid walking alone at night or in areas with limited visibility.</li>\n</ul>\n\n<h2>Best Times to Visit</h2>\n<p>The best times to visit the Boston National Historical Park are:</p>\n<ul>\n  <li>Early spring and fall, when the weather is mild and crowds are smaller.</li>\n  <li>Avoid visiting during peak tourist season (June to August), as the trail may be more crowded.</li>\n</ul>\n\n<h2>Additional Information</h2>\n<p>The Boston National Historical Park offers a variety of guided tours, including self-guided walking trails. Be sure to check with park rangers or visitor centers for up-to-date information on trail conditions and tour schedules.</p>",
+  "location": "Boston, MA",
+  "difficulty": "Medium 🟡",
+  "length": "Varies",
   "pages": [
     {
-      "id": "trail-001",
-      "title": "Yosemite Valley Hiking Trails Guide",
-      "content": "Comprehensive guide to hiking trails in Yosemite National Park including Half Dome, Mist Trail, and Lower Yosemite Fall. Features detailed information on trail difficulty, elevation gain, estimated completion times, and seasonal considerations.",
-      "trailName": "Half Dome Trail",
-      "location": "Yosemite National Park, California",
-      "difficulty": "Hard",
-      "length": "14.2 miles"
-    },
-    {
-      "id": "trail-002",
-      "title": "Appalachian Trail Camping Essentials",
-      "content": "Essential camping tips for Appalachian Trail hikers including gear recommendations, shelter selection, fire regulations, and Leave No Trace principles. Covers both established campgrounds and dispersed camping options.",
-      "trailName": "Appalachian Trail",
-      "location": "Appalachian Mountain Range, USA",
-      "difficulty": "Medium",
-      "length": "2,190 miles"
-    },
-    {
-      "id": "trail-003",
-      "title": "Great Smoky Mountains Beginner Hikes",
-      "content": "Perfect beginner hiking trails in the Great Smoky Mountains National Park. Easy to moderate trails with stunning scenery and wildlife viewing opportunities.",
-      "trailName": "Clingmans Dome Trail",
-      "location": "Great Smoky Mountains National Park, Tennessee/North Carolina",
-      "difficulty": "Easy",
-      "length": "3 miles"
-    },
-    {
-      "id": "trail-004",
-      "title": "Zion National Park Angels Landing",
-      "content": "One of the most iconic and challenging hikes in Zion National Park. This strenuous trail offers thrilling cliff-hugging experiences with breathtaking panoramic views.",
-      "trailName": "Angels Landing",
-      "location": "Zion National Park, Utah",
-      "difficulty": "Hard",
-      "length": "5.4 miles"
+      "id": "trail-869014EF-C785-42B5-9F7E-891AACBE7ED4",
+      "title": "Boston National Historical Park Hiking Guide",
+      "content": "<h1>Boston National Historical Park Hiking Trail Guide</h1>\n\n<h2>About the Trail</h2>\n<p>The Boston National Historical Park is a unique hiking trail that weaves through the historic city of Boston, Massachusetts. The trail is centered around the Charlestown Navy Yard, where visitors can explore the USS Constitution's history.</p>\n\n<h2>Trail Description and Highlights</h2>\n<ul>\n  <li>Signed titled \"'Old Ironsides' in Dry Dock 1\" marks a significant moment in the USS Constitution's years at the navy yard.</li>\n</ul>\n\n<h2>Practical Tips for Your Visit</h2>\n<p>Be sure to:</p>\n<ul>\n  <li>Check the park's website or contact the visitor center for any trail updates or closures before your visit.</li>\n  <li>Bring a map and compass, as cell phone service may be limited in some areas of the trail.</li>\n</ul>\n\n<h2>Safety Tips</h2>\n<p>To ensure a safe and enjoyable hike:</p>\n<ul>\n  <li>Wear comfortable hiking shoes and dress for the weather.</li>\n  <li>Stay hydrated by bringing plenty of water, especially on warmer days.</li>\n  <li>Avoid walking alone at night or in areas with limited visibility.</li>\n</ul>\n\n<h2>Best Times to Visit</h2>\n<p>The best times to visit the Boston National Historical Park are:</p>\n<ul>\n  <li>Early spring and fall, when the weather is mild and crowds are smaller.</li>\n  <li>Avoid visiting during peak tourist season (June to August), as the trail may be more crowded.</li>\n</ul>\n\n<h2>Additional Information</h2>\n<p>The Boston National Historical Park offers a variety of guided tours, including self-guided walking trails. Be sure to check with park rangers or visitor centers for up-to-date information on trail conditions and tour schedules.</p>",
+      "location": "Boston, MA",
+      "difficulty": "Medium 🟡",
+      "length": "Varies"
     }
   ]
 }
